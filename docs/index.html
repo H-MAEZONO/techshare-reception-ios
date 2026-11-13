@@ -3,331 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>カンファレンス受付システム</title>
+    <title>TECH SHARE 2026 受付システム</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         body { background-color: #0b0f19; color: #f8fafc; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 12px; }
-        .app-container { width: 100%; max-width: 440px; background: #131c31; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column; min-height: 92vh; border: 1px solid #1e293b; }
+        .app-container { width: 100%; max-width: 440px; background: #131c31; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column; min-height: 94vh; border: 1px solid #1e293b; }
         
-        .header { background: linear-gradient(135deg, #1d4ed8, #0f172a); padding: 18px; text-align: center; border-bottom: 1px solid #1e293b; position: relative; }
-        .header h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; }
-        .header p { font-size: 0.8rem; opacity: 0.8; margin-top: 2px; }
+        .header { background: linear-gradient(135deg, #004ea2, #e60012); padding: 18px; text-align: center; border-bottom: 1px solid #1e293b; }
+        .header h1 { font-size: 1.25rem; font-weight: 900; letter-spacing: 0.5px; }
+        .header p { font-size: 0.75rem; opacity: 0.9; margin-top: 2px; }
         
-        .device-badge-bar { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 8px 16px; font-size: 0.8rem; border-bottom: 1px solid #1e293b; }
-        .device-tag { color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .btn-reset-device { background: transparent; border: 1px solid #475569; color: #94a3b8; font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; cursor: pointer; }
+        .room-bar { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 10px 16px; border-bottom: 1px solid #1e293b; }
+        .room-bar span { font-size: 0.8rem; font-weight: 700; color: #94a3b8; }
+        .room-select { background: #1e293b; color: #38bdf8; border: 1.5px solid #0284c7; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.85rem; outline: none; }
 
         .content { padding: 16px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
 
-        .stats-card { background: #0b0f19; border: 1px solid #1e293b; border-radius: 16px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .stats-card { background: #0b0f19; border: 1px solid #1e293b; border-radius: 16px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
         .stats-label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-        .stats-count { font-size: 1.45rem; font-weight: 800; color: #fff; margin-top: 2px; }
-        .stats-rate { background: #1e3a8a; color: #60a5fa; padding: 6px 12px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; }
+        .stats-count { font-size: 1.6rem; font-weight: 900; color: #fff; margin-top: 2px; }
+        .stats-badge { background: #0369a1; color: #bae6fd; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; }
 
-        .status-card { border-radius: 20px; padding: 22px 16px; display: flex; flex-direction: column; gap: 6px; text-align: center; transition: all 0.2s ease; }
-        .status-card.STANDBY { background: #1e293b; border: 2px dashed #475569; color: #94a3b8; }
-        .status-card.SCANNING { background: #1e3a8a; border: 2px solid #3b82f6; color: #bfdbfe; animation: pulse 1.5s infinite; }
-        .status-card.SUCCESS { background: #064e3b; border: 2px solid #10b981; color: #a7f3d0; }
-        .status-card.ALREADY { background: #713f12; border: 2px solid #f59e0b; color: #fde68a; }
-        .status-card.NOT_FOUND { background: #7f1d1d; border: 2px solid #ef4444; color: #fecaca; }
+        .scan-card { border-radius: 20px; padding: 22px 16px; display: flex; flex-direction: column; gap: 6px; text-align: center; transition: all 0.2s ease; }
+        .scan-card.STANDBY { background: #1e293b; border: 2px dashed #475569; color: #94a3b8; }
+        .scan-card.ACTIVE { background: #064e3b; border: 2px solid #10b981; color: #a7f3d0; animation: pulse 2s infinite; }
+        .scan-card.SCANNED { background: #1e3a8a; border: 2px solid #38bdf8; color: #e0f2fe; }
 
-        .status-badge { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .status-title { font-size: 1.4rem; font-weight: 800; margin: 4px 0; }
-        .status-desc { font-size: 0.85rem; opacity: 0.95; line-height: 1.4; }
+        .scan-badge { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .scan-title { font-size: 1.4rem; font-weight: 800; margin: 4px 0; }
+        .scan-desc { font-size: 0.85rem; opacity: 0.95; line-height: 1.4; word-break: break-all; }
 
-        .btn-scan { background: #2563eb; color: #fff; border: none; padding: 20px; border-radius: 18px; font-size: 1.15rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); }
-        .btn-scan:active { transform: scale(0.97); }
-        .btn-scan.active { background: #10b981; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+        .btn-scan-toggle { background: #2563eb; color: #fff; border: none; padding: 18px; border-radius: 18px; font-size: 1.15rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); }
+        .btn-scan-toggle.running { background: #10b981; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
 
         .recent-section { margin-top: auto; padding-top: 10px; }
-        .recent-title { font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .recent-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        .recent-item { background: #0b0f19; border: 1px solid #1e293b; padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .recent-name { font-weight: 700; font-size: 0.95rem; color: #fff; }
-        .recent-dept { font-size: 0.75rem; color: #64748b; }
-        .recent-time { font-size: 0.85rem; color: #38bdf8; font-weight: 700; }
+        .recent-header { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .recent-list { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+        .recent-item { background: #0b0f19; border: 1px solid #1e293b; padding: 8px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .recent-id { font-family: monospace; font-weight: 700; color: #38bdf8; }
+        .recent-time { color: #94a3b8; font-size: 0.75rem; }
 
-        /* 端末認証ロック画面用モーダル */
-        .auth-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 25, 0.96); display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 9999; backdrop-filter: blur(8px); }
-        .auth-box { width: 100%; max-width: 380px; background: #1e293b; border: 1px solid #334155; border-radius: 24px; padding: 28px 22px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-        .auth-icon { font-size: 3rem; margin-bottom: 12px; }
-        .auth-box h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; }
-        .auth-box p { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px; }
-        .auth-input { width: 100%; background: #0f172a; border: 1.5px solid #475569; color: #fff; padding: 14px; border-radius: 12px; font-size: 1.1rem; text-align: center; letter-spacing: 4px; font-weight: 800; margin-bottom: 14px; outline: none; }
-        .auth-input:focus { border-color: #38bdf8; }
-        .auth-btn { width: 100%; background: #2563eb; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; }
-        .auth-btn:active { transform: scale(0.98); }
-        .auth-error { color: #f87171; font-size: 0.8rem; margin-top: 10px; display: none; font-weight: 600; }
+        .export-box { display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid #1e293b; }
+        .btn-export { flex: 2; background: #0284c7; color: white; border: none; padding: 14px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-export:active { transform: scale(0.98); }
+        .btn-clear { flex: 1; background: #334155; color: #94a3b8; border: none; padding: 14px; border-radius: 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
 
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body>
-    <!-- 端末認証ロック画面 -->
-    <div id="authOverlay" class="auth-overlay">
-        <div class="auth-box">
-            <div class="auth-icon">🔒</div>
-            <h2>受付端末 認証登録</h2>
-            <p>本システムは許可された4会場の端末に限定されています。会場別PINコードを入力してください。</p>
-            <input type="password" id="txtPin" class="auth-input" maxlength="6" placeholder="PINコード">
-            <button class="auth-btn" onclick="submitAuth()">端末を承認して起動</button>
-            <div id="authErrMsg" class="auth-error">※無効なPINコードです</div>
-        </div>
-    </div>
-
-    <!-- メインアプリ画面 -->
     <div class="app-container">
         <div class="header">
-            <h1>カンファレンス受付</h1>
-            <p>Android Web NFC 高速出席管理</p>
+            <h1>TECH SHARE 2026</h1>
+            <p>BOOST // 出席ログ収集システム</p>
         </div>
 
-        <div class="device-badge-bar">
-            <div class="device-tag">
-                <span>🛡️</span>
-                <span id="lblDeviceName">認証確認中...</span>
-            </div>
-            <button class="btn-reset-device" onclick="resetDevice()">端末認証解除</button>
+        <div class="room-bar">
+            <span>📍 受付部屋:</span>
+            <select id="selRoom" class="room-select" onchange="saveRoomPreference()">
+                <optgroup label="🏢 シマブンビル">
+                    <option value="シマブン 13F (総合受付)">シマブン 13F (総合受付)</option>
+                    <option value="シマブン 13F (Track 1)">シマブン 13F (Track 1: AI・新技術)</option>
+                    <option value="シマブン 11F (Track 2)">シマブン 11F (Track 2: クラウド・データ)</option>
+                    <option value="シマブン 11F (Track 3)">シマブン 11F (Track 3: 組織変革・育成)</option>
+                    <option value="シマブン 11F (Track 4)">シマブン 11F (Track 4: レガシー・刷新)</option>
+                </optgroup>
+                <optgroup label="🏢 神鋼ビル (Day 2 WS)">
+                    <option value="神鋼ビル 6階 研修室 (WS)">神鋼ビル 6階 研修室 (ワークショップ)</option>
+                </optgroup>
+            </select>
         </div>
 
         <div class="content">
             <div class="stats-card">
                 <div>
-                    <div class="stats-label">全社出席状況</div>
-                    <div class="stats-count" id="lblStatsCount">0 / 0 名</div>
+                    <div class="stats-label">この端末の累計スキャン</div>
+                    <div class="stats-count" id="lblScanCount">0 件</div>
                 </div>
-                <div class="stats-rate" id="lblStatsRate">0.0%</div>
+                <div class="stats-badge" id="lblLastSync">ローカル保存中</div>
             </div>
 
-            <div id="statusCard" class="status-card STANDBY">
-                <div class="status-badge" id="lblBadge">待機中</div>
-                <div class="status-title" id="lblTitle">下のボタンを押してください</div>
-                <div class="status-desc" id="lblDesc">「NFCリーダー起動」を押して社員証をスマホ背面にタッチ</div>
+            <div id="scanCard" class="scan-card STANDBY">
+                <div class="scan-badge" id="lblBadge">待機中</div>
+                <div class="scan-title" id="lblTitle">下のボタンを押してください</div>
+                <div class="scan-desc" id="lblDesc">「受付スキャンを開始」を押すと常時かざし受付が有効になります</div>
             </div>
 
-            <button id="btnScan" class="btn-scan" onclick="toggleNfcScan()">
-                <span style="font-size: 1.5rem;">📱</span>
-                <span id="btnScanText">NFCリーダーを起動する</span>
+            <button id="btnScanToggle" class="btn-scan-toggle" onclick="toggleScanner()">
+                <span style="font-size: 1.4rem;">📱</span>
+                <span id="btnScanText">受付スキャンを開始する</span>
             </button>
 
-            <!-- 動作確認用クイックテスト -->
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:4px;">
-                <button onclick="processCard('0102030405060708')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:8px; border-radius:8px; font-size:0.75rem; cursor:pointer;">テスト1: 山田 太郎</button>
-                <button onclick="processCard('0203040506070809')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:8px; border-radius:8px; font-size:0.75rem; cursor:pointer;">テスト2: 佐藤 花子</button>
-                <button onclick="processCard('030405060708090A')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:8px; border-radius:8px; font-size:0.75rem; cursor:pointer;">テスト3: 鈴木 (重複)</button>
-                <button onclick="processCard('UNKNOWN_CARD_99')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:8px; border-radius:8px; font-size:0.75rem; cursor:pointer;">テスト4: 未登録カード</button>
+            <!-- 動作確認用テストボタン -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                <button onclick="recordScan('0102030405060708')" style="background:#1e293b; border:1px solid #334155; color:#94a3b8; padding:8px; border-radius:8px; font-size:0.75rem; cursor:pointer;">テスト1 タッチ</button>
+                <button onclick="recordScan('0203040506070809')" style="background:#1e293b; border:1px solid #334155; color:#94a3b8; padding:8px; border-radius:8px; font-size:0.75rem; cursor:pointer;">テスト2 タッチ</button>
             </div>
 
             <div class="recent-section">
-                <div class="recent-title">
-                    <span>直近の受付者</span>
-                    <span id="lblRecentTotal">(0名)</span>
+                <div class="recent-header">
+                    <span>直近のスキャン履歴 (最新順)</span>
+                    <span id="lblRecentCount">0件</span>
                 </div>
                 <ul class="recent-list" id="recentList">
-                    <li style="text-align:center; padding:12px; color:#475569; font-size:0.8rem;">受付済みの履歴はありません</li>
+                    <li style="text-align:center; padding:12px; color:#475569; font-size:0.8rem;">まだスキャン履歴はありません</li>
                 </ul>
+            </div>
+
+            <div class="export-box">
+                <button class="btn-export" onclick="exportData()">
+                    <span>📤</span>
+                    <span>ログをCSV共有・PCへ送信</span>
+                </button>
+                <button class="btn-clear" onclick="clearLogs()">消去</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 4会場の認証PINコードマッピング
-        const VENUE_PINS = {
-            "1001": "第1会場 (メインホール)",
-            "1002": "第2会場 (サテライトA)",
-            "1003": "第3会場 (サテライトB)",
-            "1004": "第4会場 (オンライン中継室)"
-        };
+        const STORAGE_KEY = "techshare_2026_reception_logs";
+        const ROOM_PREF_KEY = "techshare_room_pref";
 
-        let currentVenue = "";
+        let scanLogs = [];
 
-        // 端末認証チェック
-        function checkDeviceAuth() {
-            const savedVenue = localStorage.getItem("conf_auth_venue");
-            const savedToken = localStorage.getItem("conf_auth_token");
-            if (savedVenue && savedToken) {
-                currentVenue = savedVenue;
-                document.getElementById("authOverlay").style.display = "none";
-                document.getElementById("lblDeviceName").textContent = `承認済: ${savedVenue}`;
-                return true;
-            } else {
-                document.getElementById("authOverlay").style.display = "flex";
-                return false;
-            }
+        // 部屋の復元
+        const savedRoom = localStorage.getItem(ROOM_PREF_KEY);
+        if (savedRoom) {
+            document.getElementById("selRoom").value = savedRoom;
         }
 
-        function submitAuth() {
-            const pin = document.getElementById("txtPin").value.trim();
-            const errMsg = document.getElementById("authErrMsg");
-            
-            if (VENUE_PINS[pin]) {
-                const venueName = VENUE_PINS[pin];
-                localStorage.setItem("conf_auth_venue", venueName);
-                localStorage.setItem("conf_auth_token", "AUTH_" + Math.random().toString(36).substring(2) + Date.now());
-                errMsg.style.display = "none";
-                checkDeviceAuth();
-            } else {
-                errMsg.style.display = "block";
-            }
+        function saveRoomPreference() {
+            const room = document.getElementById("selRoom").value;
+            localStorage.setItem(ROOM_PREF_KEY, room);
         }
 
-        function resetDevice() {
-            if (confirm("この端末の承認を解除しますか？\n（再度PINコードの入力が必要になります）")) {
-                localStorage.removeItem("conf_auth_venue");
-                localStorage.removeItem("conf_auth_token");
-                location.reload();
-            }
-        }
-
-        // 名簿マスタ
-        let attendees = [
-            { id: "E10001", name: "山田 太郎", dept: "技術推進部", card: "0102030405060708", status: "未出席", time: "", venue: "" },
-            { id: "E10002", name: "佐藤 花子", dept: "総務人事部", card: "0203040506070809", status: "未出席", time: "", venue: "" },
-            { id: "E10003", name: "鈴木 一郎", dept: "デジタル推進部", card: "030405060708090A", status: "出席", time: "09:30", venue: "第1会場 (メインホール)" },
-            { id: "E10004", name: "高橋 美咲", dept: "事業開発部", card: "0405060708090A0B", status: "未出席", time: "", venue: "" },
-            { id: "E10005", name: "田中 健一", dept: "セキュリティ室", card: "05060708090A0B0C", status: "未出席", time: "", venue: "" }
-        ];
-
+        // ログの復元
         try {
-            const saved = localStorage.getItem("conf_attendees_v3");
-            if (saved) attendees = JSON.parse(saved);
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) scanLogs = JSON.parse(raw);
         } catch(e) {}
 
-        function saveState() {
-            try { localStorage.setItem("conf_attendees_v3", JSON.stringify(attendees)); } catch(e) {}
+        function saveLogs() {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(scanLogs)); } catch(e) {}
         }
 
         function updateUI() {
-            const total = attendees.length;
-            const attended = attendees.filter(a => a.status === "出席").length;
-            const rate = total > 0 ? ((attended / total) * 100).toFixed(1) : "0.0";
+            document.getElementById("lblScanCount").textContent = `${scanLogs.length} 件`;
+            document.getElementById("lblRecentCount").textContent = `${scanLogs.length}件`;
 
-            document.getElementById("lblStatsCount").textContent = `${attended} / ${total} 名`;
-            document.getElementById("lblStatsRate").textContent = `${rate}%`;
-            document.getElementById("lblRecentTotal").textContent = `(${attended}名完了)`;
-
-            const recents = attendees.filter(a => a.status === "出席" && a.time).reverse().slice(0, 4);
-            const ul = document.getElementById("recentList");
-            ul.innerHTML = "";
-            if (recents.length === 0) {
-                ul.innerHTML = `<li style="text-align:center; padding:12px; color:#475569; font-size:0.8rem;">受付済みの履歴はありません</li>`;
+            const list = document.getElementById("recentList");
+            list.innerHTML = "";
+            if (scanLogs.length === 0) {
+                list.innerHTML = `<li style="text-align:center; padding:12px; color:#475569; font-size:0.8rem;">まだスキャン履歴はありません</li>`;
             } else {
-                recents.forEach(r => {
+                scanLogs.slice().reverse().slice(0, 10).forEach(log => {
                     const li = document.createElement("li");
                     li.className = "recent-item";
                     li.innerHTML = `
                         <div>
-                            <div class="recent-name">${r.name} さん</div>
-                            <div class="recent-dept">${r.dept} (${r.id})</div>
+                            <span class="recent-id">${log.cardId}</span>
+                            <div style="font-size:0.7rem; color:#64748b;">${log.room}</div>
                         </div>
-                        <div style="text-align:right;">
-                            <div class="recent-time">${r.time}</div>
-                            <div style="font-size:0.7rem; color:#64748b;">${r.venue}</div>
-                        </div>
+                        <div class="recent-time">${log.time.split(" ")[1]}</div>
                     `;
-                    ul.appendChild(li);
+                    list.appendChild(li);
                 });
             }
         }
 
-        function processCard(cardId) {
-            const cleanId = (cardId || "").trim();
-            if (!cleanId) return;
-
-            const card = document.getElementById("statusCard");
-            const badge = document.getElementById("lblBadge");
-            const title = document.getElementById("lblTitle");
-            const desc = document.getElementById("lblDesc");
-
-            if (navigator.vibrate) navigator.vibrate(100);
-
-            const target = attendees.find(a => a.card.toLowerCase() === cleanId.toLowerCase() || a.id.toLowerCase() === cleanId.toLowerCase());
-
-            if (!target) {
-                card.className = "status-card NOT_FOUND";
-                badge.textContent = "未登録カード";
-                title.textContent = "未登録のカードです";
-                desc.textContent = `ID: ${cleanId} は名簿に登録されていません。総合案内へご案内ください。`;
-                return;
-            }
-
-            if (target.status === "出席") {
-                card.className = "status-card ALREADY";
-                badge.textContent = "受付済み";
-                title.textContent = `${target.name} さん`;
-                desc.textContent = `※既に ${target.time} に受付済みです（${target.venue}）`;
-                return;
-            }
+        function recordScan(rawId) {
+            if (!rawId) return;
+            const cardId = rawId.trim().toUpperCase();
+            const room = document.getElementById("selRoom").value;
 
             const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            target.status = "出席";
-            target.time = timeStr;
-            target.venue = currentVenue || "会場受付";
-            saveState();
+            const pad = n => String(n).padStart(2, '0');
+            const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-            card.className = "status-card SUCCESS";
-            badge.textContent = "受付完了";
-            title.textContent = `${target.name} さん`;
-            desc.textContent = `${target.dept} (${target.id}) - 受付が完了しました`;
+            // バイブレーション
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+            // ログ蓄積
+            const logEntry = {
+                timestamp: dateStr,
+                time: dateStr,
+                room: room,
+                cardId: cardId
+            };
+            scanLogs.push(logEntry);
+            saveLogs();
+
+            // 画面表示
+            const card = document.getElementById("scanCard");
+            card.className = "scan-card SCANNED";
+            document.getElementById("lblBadge").textContent = "スキャン完了";
+            document.getElementById("lblTitle").textContent = "カードIDを記録しました";
+            document.getElementById("lblDesc").textContent = `${dateStr}\n[${room}]\nID: ${cardId}`;
 
             updateUI();
+
+            // 1.2秒後に待機状態へ自動復帰
+            setTimeout(() => {
+                if (isScanning) {
+                    card.className = "scan-card ACTIVE";
+                    document.getElementById("lblBadge").textContent = "常時スキャン待機中";
+                    document.getElementById("lblTitle").textContent = "社員証をタッチしてください";
+                    document.getElementById("lblDesc").textContent = "スマホの背面にカードをかざしてください";
+                }
+            }, 1200);
         }
 
-        let ndefInstance = null;
+        let isScanning = false;
+        let ndef = null;
 
-        async function toggleNfcScan() {
-            const btn = document.getElementById("btnScan");
+        async function toggleScanner() {
+            const btn = document.getElementById("btnScanToggle");
             const btnText = document.getElementById("btnScanText");
-            const card = document.getElementById("statusCard");
-            const badge = document.getElementById("lblBadge");
-            const title = document.getElementById("lblTitle");
-            const desc = document.getElementById("lblDesc");
+            const card = document.getElementById("scanCard");
 
             if (!("NDEFReader" in window)) {
-                alert("お使いの環境は Web NFC に対応していません。Android の Google Chrome で開いてください。");
-                const val = prompt("【手動入力】カードID または 社員番号を入力:", "0102030405060708");
-                if (val) processCard(val);
+                alert("お使いのブラウザは Web NFC に対応していません。Android の Google Chrome で開いてください。");
+                const testVal = prompt("【手動入力】カードIDを入力してください:", "0102030405060708");
+                if (testVal) recordScan(testVal);
                 return;
             }
 
             try {
-                if (!ndefInstance) {
-                    ndefInstance = new NDEFReader();
-                    await ndefInstance.scan();
-                    
-                    ndefInstance.onreading = event => {
-                        const serialNumber = event.serialNumber;
-                        if (serialNumber) {
-                            const normalized = serialNumber.replace(/:/g, '').toUpperCase();
-                            processCard(normalized);
+                if (!ndef) {
+                    ndef = new NDEFReader();
+                    await ndef.scan();
+                    ndef.onreading = event => {
+                        const serial = event.serialNumber;
+                        if (serial) {
+                            const normalized = serial.replace(/:/g, '').toUpperCase();
+                            recordScan(normalized);
                         } else {
-                            processCard("UNKNOWN_TAG");
+                            recordScan("TAG_DETECTED");
                         }
                     };
-
-                    ndefInstance.onreadingerror = () => {
-                        card.className = "status-card NOT_FOUND";
-                        badge.textContent = "読取エラー";
-                        title.textContent = "読み取りに失敗しました";
-                        desc.textContent = "カードをもう一度しっかりとスマホ背面にタッチしてください。";
+                    ndef.onreadingerror = () => {
+                        alert("読み取りエラー: もう一度カードをしっかりタッチしてください。");
                     };
                 }
 
-                btn.className = "btn-scan active";
-                btnText.textContent = "NFC常時待機中（タッチしてください）";
-                card.className = "status-card SCANNING";
-                badge.textContent = "スキャン待機中";
-                title.textContent = "社員証を背面にタッチ";
-                desc.textContent = "スマホ背面のNFCアンテナ部に社員証をかざしてください";
+                isScanning = true;
+                btn.className = "btn-scan-toggle running";
+                btnText.textContent = "NFC稼働中（タップして停止）";
+                card.className = "scan-card ACTIVE";
+                document.getElementById("lblBadge").textContent = "常時スキャン待機中";
+                document.getElementById("lblTitle").textContent = "社員証をタッチしてください";
+                document.getElementById("lblDesc").textContent = "スマホの背面にカードをかざしてください";
 
             } catch (err) {
-                alert("NFCの起動に失敗しました: " + err.message + "\n※Androidの設定でNFCがONになっているか確認してください。");
+                alert("NFCの起動に失敗しました: " + err.message + "\n※Androidの設定でNFCがONになっていることをご確認ください。");
             }
         }
 
-        // 初期化
-        checkDeviceAuth();
+        // CSVエクスポート・共有
+        async function exportData() {
+            if (scanLogs.length === 0) {
+                alert("記録されたスキャンログがありません。");
+                return;
+            }
+
+            // CSVデータ生成（Excel対応のUTF-8 BOM付き）
+            let csvContent = "\uFEFF日時,部屋_トラック,カードID\n";
+            scanLogs.forEach(row => {
+                csvContent += `"${row.timestamp}","${row.room}","${row.cardId}"\n`;
+            });
+
+            const fileName = `techshare_logs_${new Date().toISOString().slice(0,10)}.csv`;
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+            // スマホのWeb Share API（メール/Teams/共有）
+            if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "text/csv" })] })) {
+                try {
+                    const file = new File([blob], fileName, { type: "text/csv" });
+                    await navigator.share({
+                        title: "TECH SHARE 2026 出席受付ログ",
+                        text: `TECH SHARE 2026 受付ログ (${scanLogs.length}件)`,
+                        files: [file]
+                    });
+                    return;
+                } catch(e) {
+                    // キャンセル等の場合はダウンロードフォールバック
+                }
+            }
+
+            // 通常ダウンロードフォールバック
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
+
+        function clearLogs() {
+            if (confirm("この端末に保存されたログをすべて消去しますか？\n（エクスポート済みであることを確認してください）")) {
+                scanLogs = [];
+                localStorage.removeItem(STORAGE_KEY);
+                updateUI();
+                alert("ログを消去しました。");
+            }
+        }
+
         updateUI();
     </script>
 </body>
