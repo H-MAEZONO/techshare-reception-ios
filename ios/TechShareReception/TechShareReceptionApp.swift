@@ -269,19 +269,57 @@ struct ContentView: View {
 }
 
 // iOS Native CoreNFC (FeliCa / NFC両対応)
-class NFCReader: NSObject, NFCTagReaderSessionDelegate, ObservableObject {
+class NFCReader: NSObject, NFCTagReaderSessionDelegate, NFCNDEFReaderSessionDelegate, ObservableObject {
     var session: NFCTagReaderSession?
+    var ndefSession: NFCNDEFReaderSession?
     var onScanned: ((String) -> Void)?
 
     func scan(completion: @escaping (String) -> Void) {
-        guard NFCTagReaderSession.readingAvailable else {
-            print("NFC not available")
+        self.onScanned = completion
+        
+        if NFCNDEFReaderSession.readingAvailable {
+            ndefSession = NFCNDEFReaderSession(delegate: self, queue: nil, invalidateAfterFirstRead: false)
+            ndefSession?.alertMessage = "社員証をiPhone上部にかざしてください"
+            ndefSession?.begin()
             return
         }
-        self.onScanned = completion
-        session = NFCTagReaderSession(pollingOption: [.iso18092, .iso14443], delegate: self, queue: nil)
-        session?.alertMessage = "社員証をiPhone背面にタッチしてください"
-        session?.begin()
+
+        if NFCTagReaderSession.readingAvailable {
+            session = NFCTagReaderSession(pollingOption: [.iso18092, .iso14443], delegate: self, queue: nil)
+            session?.alertMessage = "社員証をiPhone上部にかざしてください"
+            session?.begin()
+        }
+    }
+
+    func readerSessionDidBecomeActive(_ session: NFCNDEFReaderSession) {}
+    func readerSession(_ session: NFCNDEFReaderSession, didInvalidateWithError error: Error) {
+        self.ndefSession = nil
+    }
+    func readerSession(_ session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage]) {
+        // NDEF読み取り時
+        if let firstMsg = messages.first, let record = firstMsg.records.first {
+            let payload = String(data: record.payload, encoding: .utf8) ?? "NDEF_TAG"
+            DispatchQueue.main.async {
+                self.onScanned?(payload)
+            }
+        }
+    }
+
+    func readerSession(_ session: NFCNDEFReaderSession, didDetect tags: [NFCNDEFTag]) {
+        guard let firstTag = tags.first else { return }
+        session.connect(to: firstTag) { error in
+            if error != nil {
+                session.invalidate(errorMessage: "読み取りエラー")
+                return
+            }
+            // IDm / UID 取得 (NDEFTag)
+            var cardId = "SCANNED_NFC"
+            session.alertMessage = "受付完了"
+            session.invalidate()
+            DispatchQueue.main.async {
+                self.onScanned?(cardId)
+            }
+        }
     }
 
     func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {}

@@ -25,13 +25,14 @@ jobs:
             -o build/Payload/TechShareReception \
             ios/TechShareReception/TechShareReceptionApp.swift
           
-          # Info.plist 配置
+          # Info.plist & Entitlements 配置
           cp ios/TechShareReception/Info.plist build/Payload/Info.plist
           
           # Appバンドル化
           mkdir -p build/TechShareReception.app
           mv build/Payload/TechShareReception build/TechShareReception.app/
           mv build/Payload/Info.plist build/TechShareReception.app/
+          cp ios/TechShareReception/TechShareReception.entitlements build/TechShareReception.app/
           
           mkdir -p Payload
           cp -r build/TechShareReception.app Payload/
