@@ -18,6 +18,7 @@ jobs:
           
           # Swift コンパイル (iOS target)
           xcrun --sdk iphoneos swiftc \
+            -parse-as-library \
             -target arm64-apple-ios16.0 \
             -framework SwiftUI \
             -framework CoreNFC \
