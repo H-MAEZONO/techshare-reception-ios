@@ -7,17 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Xcode
-        uses: maxim-lobachevsky/setup-xcode@v1
-        with:
-          xcode-version: '15.4'
-
-      - name: Create Xcode Project Structure & Compile
+      - name: Compile Swift & Package IPA
         run: |
           mkdir -p build/Payload
           
@@ -32,7 +27,7 @@ jobs:
           # Info.plist 配置
           cp ios/TechShareReception/Info.plist build/Payload/Info.plist
           
-          # ディレクトリ構造を App バンドル化
+          # Appバンドル化
           mkdir -p build/TechShareReception.app
           mv build/Payload/TechShareReception build/TechShareReception.app/
           mv build/Payload/Info.plist build/TechShareReception.app/
